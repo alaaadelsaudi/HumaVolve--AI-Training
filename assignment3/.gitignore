@@ -1,11 +1,10 @@
+# .gitignore
 venv/
 .venv/
 .env
 *.log
 app.log
+__pycache__/
 .pytest_cache/
 .idea/
 .vscode/
-__pycache__/
-*.pyc
-
