@@ -24,6 +24,21 @@ class RAGService:
     def _format_docs(self, docs):
         return "\n\n".join(d.page_content for d in docs)
 
+    def _extract_text(self, raw_content):
+        """يحول محتوى الرد لصيغة نص عادي، بغض النظر عن شكل رد الموديل."""
+        if isinstance(raw_content, str):
+            return raw_content
+        elif isinstance(raw_content, list):
+            text_parts = []
+            for block in raw_content:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    text_parts.append(block.get("text", ""))
+                elif isinstance(block, str):
+                    text_parts.append(block)
+            return "".join(text_parts)
+        else:
+            return str(raw_content)
+
     def answer_ticket(self, customer_ticket: str) -> dict:
         start_time = time.time()
         logger.info(f"Processing ticket: {customer_ticket[:50]}...")
@@ -37,7 +52,8 @@ class RAGService:
             | self.prompt | self.llm
         )
         ai_message = rag_chain.invoke(customer_ticket)
-        response_text = getattr(ai_message, "content", str(ai_message))
+        raw_content = getattr(ai_message, "content", ai_message)
+        response_text = self._extract_text(raw_content)
 
         usage = getattr(ai_message, "usage_metadata", None) or {}
         prompt_tokens = usage.get("input_tokens", 0)

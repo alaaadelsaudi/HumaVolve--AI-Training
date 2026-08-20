@@ -1,7 +1,0 @@
-app:
-  name: "My Assignment API"
-  version: "1.0.0"
-
-models:
-  provider: "dummy"
-  model_name: "placeholder-model-v1"
